@@ -27,12 +27,12 @@ def write_classification(X_test, y_test, model, model_name, parameters) :
     f.write(classification_report(y_test, model.predict(X_test)) + '\n')
 
 
-def print_classification(X_test, y_test, model, model_name, parameters) :
+def print_classification(X_test, y_test, classifier, model_name, parameters) :
     print(model_name + " model with " + parameters)
     print(model_name + " confusion matrix")
-    print(metrics.confusion_matrix(y_test, model.predict(X_test)))
+    print(metrics.confusion_matrix(y_test, classifier.predict(X_test)))
     print(model_name + " classification report")
-    print(classification_report(y_test, model.predict(X_test)))
+    print(classification_report(y_test, classifier.predict(X_test)))
 
 
 
@@ -115,21 +115,19 @@ X_train2, X_test2, y2_train, y2_test = train_test_split(P, sentiments, test_size
 #part 2.3.1
 classifier_MNB = MultinomialNB()
 
-model1 = classifier_MNB.fit(X_train1, y1_train)#emotion
-
+#model1 = classifier_MNB.fit(X_train1, y1_train)#emotion
 
 #Base-MNB emotions
+classifier_MNB.fit(X_train1, y1_train)#emotion
+print_classification(X_test1, y1_test, classifier_MNB, "Base-MNB emotions", "default parameters")
+write_classification(X_test1, y1_test, classifier_MNB, "Base-MNB emotions", "default parameters")
 
-print_classification(X_test1, y1_test, model1, "Base-MNB emotions", "default parameters")
-write_classification(X_test1, y1_test, model1, "Base-MNB emotions", "default parameters")
-
-
-model2 = classifier_MNB.fit(X_train2, y2_train)#sentiment
+#model2 = classifier_MNB.fit(X_train2, y2_train)#sentiment
 
 #Base-MNB sentiments
-
-print_classification(X_test2, y2_test, model1, "Base-MNB sentiments", "default parameters")
-write_classification(X_test2, y2_test, model2, "Base-MNB sentiments", "default parameters")
+classifier_MNB.fit(X_train2, y2_train)#sentiment
+print_classification(X_test2, y2_test, classifier_MNB, "Base-MNB sentiments", "default parameters")
+write_classification(X_test2, y2_test, classifier_MNB, "Base-MNB sentiments", "default parameters")
 
 
 
@@ -141,32 +139,33 @@ write_classification(X_test2, y2_test, model2, "Base-MNB sentiments", "default p
 
 #part 2.3.2
 #DT
-
 dtc = tree.DecisionTreeClassifier()
-d_model1 = dtc.fit(X_train1, y1_train)
-d_model2 = dtc.fit(X_train2, y2_train)
 
 
-print_classification(X_test1, y1_test, d_model1, "Base-DT emotions", "default parameters")
-write_classification(X_test1, y1_test, d_model1, "Base-DT emotions", "default parameters")
 
-print_classification(X_test2, y2_test, d_model2, "Base-DT sentiments", "default parameters")
-write_classification(X_test2, y2_test, d_model2, "Base-DT sentiments", "default parameters")
+
+dtc.fit(X_train1, y1_train)
+print_classification(X_test1, y1_test, dtc, "Base-DT emotions", "default parameters")
+write_classification(X_test1, y1_test, dtc, "Base-DT emotions", "default parameters")
+dtc.fit(X_train2, y2_train)
+print_classification(X_test2, y2_test, dtc, "Base-DT sentiments", "default parameters")
+write_classification(X_test2, y2_test, dtc, "Base-DT sentiments", "default parameters")
 
 
 
 
 
 #Base-MLP
-mlp_model1 = MLPClassifier(max_iter=1).fit(X_train1, y1_train)
-mlp_model2 = MLPClassifier(max_iter=1).fit(X_train2, y2_train)
+#mlp_model1 = MLPClassifier(max_iter=1).fit(X_train1, y1_train)
+#mlp_model2 = MLPClassifier(max_iter=1).fit(X_train2, y2_train)
+mlp = MLPClassifier(max_iter=1).fit(X_train1, y1_train)
+print_classification(X_test1, y1_test, mlp, "Base-MLP emotions", "default parameters")
+write_classification(X_test1, y1_test, mlp, "Base-MLP emotions", "default parameters")
 
 
-print_classification(X_test1, y1_test, mlp_model1, "Base-MLP emotions", "default parameters")
-write_classification(X_test1, y1_test, mlp_model1, "Base-MLP emotions", "default parameters")
-
-print_classification(X_test2, y2_test, mlp_model2, "Base-MLP sentiments", "default parameters")
-write_classification(X_test2, y2_test, mlp_model2, "Base-MLP sentiments", "default parameters")
+mlp = MLPClassifier(max_iter=1).fit(X_train2, y2_train)
+print_classification(X_test2, y2_test, mlp, "Base-MLP sentiments", "default parameters")
+write_classification(X_test2, y2_test, mlp, "Base-MLP sentiments", "default parameters")
 
 #TOP-MNP
 
@@ -177,16 +176,19 @@ search_space = {
 
 GS = GridSearchCV(estimator=MultinomialNB(),
                   param_grid = search_space)
-GS_model1 = GS.fit(X_train1, y1_train)
-GS_model2 = GS.fit(X_train2, y2_train)
+#GS_model1 = GS.fit(X_train1, y1_train)
+#GS_model2 = GS.fit(X_train2, y2_train)
 
 
-print_classification(X_test1, y1_test, GS_model1, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
-write_classification(X_test1, y1_test, GS_model1, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
 
-print_classification(X_test2, y2_test, GS_model2, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
-write_classification(X_test2, y2_test, GS_model2, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
 
+GS.fit(X_train1, y1_train)
+print_classification(X_test1, y1_test, GS, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
+write_classification(X_test1, y1_test, GS, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
+
+GS.fit(X_train2, y2_train)
+print_classification(X_test2, y2_test, GS, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
+write_classification(X_test2, y2_test, GS, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
 
 
 
@@ -199,15 +201,16 @@ search_space_DT = {
 
 GS_DT = GridSearchCV(tree.DecisionTreeClassifier(),
                      search_space_DT)
-GS_DT_model1 = GS_DT.fit(X_train1, y1_train)
-GS_DT_model2 = GS_DT.fit(X_train2, y2_train)
+#GS_DT_model1 = GS_DT.fit(X_train1, y1_train)
+#GS_DT_model2 = GS_DT.fit(X_train2, y2_train)
 
+GS_DT.fit(X_train1, y1_train)
+print_classification(X_test1, y1_test, GS_DT, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+write_classification(X_test1, y1_test, GS_DT, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
 
-print_classification(X_test1, y1_test, GS_DT_model1, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
-write_classification(X_test1, y1_test, GS_DT_model1, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
-
-print_classification(X_test2, y2_test, GS_DT_model2, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
-write_classification(X_test2, y2_test, GS_DT_model2, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+GS_DT.fit(X_train2, y2_train)
+print_classification(X_test2, y2_test, GS_DT, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+write_classification(X_test2, y2_test, GS_DT, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
 
 
 
@@ -221,22 +224,111 @@ search_space_Top_MLP = {
 GS_MLP = GridSearchCV(MLPClassifier(max_iter=1),
                       search_space_Top_MLP,
                       )
-GS_MLP_model1 = GS_MLP.fit(X_train1, y1_train)
-GS_MLP_model2 = GS_MLP.fit(X_train2, y2_train)
+#GS_MLP_model1 = GS_MLP.fit(X_train1, y1_train)
+#GS_MLP_model2 = GS_MLP.fit(X_train2, y2_train)
+GS_MLP.fit(X_train1, y1_train)
+print_classification(X_test1, y1_test, GS_MLP, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
+write_classification(X_test1, y1_test, GS_MLP, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
 
-print_classification(X_test1, y1_test, GS_MLP_model1, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
-write_classification(X_test1, y1_test, GS_MLP_model1, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
-
-print_classification(X_test2, y2_test, GS_MLP_model2, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
-write_classification(X_test2, y2_test, GS_MLP_model2, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
-
-
-
+GS_MLP.fit(X_train2, y2_train)
+print_classification(X_test2, y2_test, GS_MLP, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
+write_classification(X_test2, y2_test, GS_MLP, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
 
 
+
+
+#part 2.5
+
+X_train3, X_test3, y3_train, y3_test = train_test_split(P, emotions, test_size=0.7) #split for emotion
+X_train4, X_test4, y4_train, y4_test = train_test_split(P, sentiments, test_size=0.7) #split for sentiment
+
+
+
+#Base-MNB emotions
+classifier_MNB.fit(X_train3,  y3_train)#emotion
+print_classification(X_test3, y3_test, classifier_MNB, "Base-MNB emotions", "default parameters")
+write_classification(X_test3, y3_test, classifier_MNB, "Base-MNB emotions", "default parameters")
+#Base-MNB sentiments
+classifier_MNB.fit(X_train4, y4_train)#sentiment
+print_classification(X_test4, y4_test, classifier_MNB, "Base-MNB sentiments", "default parameters")
+write_classification(X_test4, y4_test, classifier_MNB, "Base-MNB sentiments", "default parameters")
+
+
+
+
+#MNB_predict_sen = model2.predict(MNB_test_sen)
+#print('Predicted class = ', MNB_predict_sen)
+
+
+
+#part 2.3.2
+#DT
+
+
+dtc.fit(X_train3, y3_train)
+print_classification(X_test3, y3_test, dtc, "Base-DT emotions", "default parameters")
+write_classification(X_test3, y3_test, dtc, "Base-DT emotions", "default parameters")
+
+dtc.fit(X_train4, y4_train)
+print_classification(X_test4, y4_test, dtc, "Base-DT sentiments", "default parameters")
+write_classification(X_test4, y4_test, dtc, "Base-DT sentiments", "default parameters")
+
+
+
+
+
+#Base-MLP
+mlp_model3 = MLPClassifier(max_iter=1).fit(X_train3, y3_train)
+mlp_model4 = MLPClassifier(max_iter=1).fit(X_train4, y4_train)
+
+
+print_classification(X_test3, y3_test, mlp_model3, "Base-MLP emotions", "default parameters")
+write_classification(X_test3, y3_test, mlp_model3, "Base-MLP emotions", "default parameters")
+
+print_classification(X_test4, y4_test, mlp_model4, "Base-MLP sentiments", "default parameters")
+write_classification(X_test4, y4_test, mlp_model4, "Base-MLP sentiments", "default parameters")
+
+#TOP-MNP
+
+
+
+
+GS.fit(X_train3, y3_train)
+print_classification(X_test3, y3_test, GS, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
+write_classification(X_test3, y3_test, GS, "Top-MNB emotions", "alpha : [0, 0.5, 4, 5]")
+
+GS.fit(X_train4, y4_train)
+print_classification(X_test4, y4_test, GS, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
+write_classification(X_test4, y4_test, GS, "Top-MNB sentiments", "alpha : [0, 0.5, 4, 5]")
+
+
+
+
+#TOP-DT
+
+
+GS_DT.fit(X_train3, y3_train)
+print_classification(X_test3, y3_test, GS_DT, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+write_classification(X_test3, y3_test, GS_DT, "Top-DT emotions", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+
+GS_DT.fit(X_train4, y4_train)
+print_classification(X_test4, y4_test, GS_DT, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+write_classification(X_test4, y4_test, GS_DT, "Top-DT sentiments", "criterion: entropy, max_depth: 10, 11, min_sample: 5, 10, 15")
+
+
+
+#Top-MLP
+GS_MLP.fit(X_train3, y3_train)
+print_classification(X_test3, y3_test, GS_MLP, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
+write_classification(X_test3, y3_test, GS_MLP, "Top-MLP emotions", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
+
+GS_MLP.fit(X_train4, y4_train)
+print_classification(X_test4, y4_test, GS_MLP, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
+write_classification(X_test4, y4_test, GS_MLP, "Top-MLP sentiments", "activation: sigmoid, tanh, relu, identity, solver: adam and sgd")
 
 
 
 f.close()
-
+#Part 2.5
+# with test size of 70%, it significantly decreases the accuracy score for all the 6 classifiers, it is because only 30% of dataset was used to train so more datasets of training lead better overall accuracy score.
 
